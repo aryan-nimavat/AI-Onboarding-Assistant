@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')), # for login/logout in browsable API
     path('api/token/', views.obtain_auth_token), # endpoint to get auth token
-    # path('api/agents/', include('agents.urls')), # including agents' urls
+    path('api/', include('agents.urls')), # including agents' urls
 ]
 
 if settings.DEBUG:

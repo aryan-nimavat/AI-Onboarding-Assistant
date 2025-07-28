@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+
+load_dotenv() # loads variables from .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-2l1a&ydf@g8g2pho(dp1f19k@zttb$$^p73n@0a7nsd_epf9#@'
+
+# fetch Groq API key
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -159,3 +165,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # For message broker (0 is database number)
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1' # For storing results (1 is another database number)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+CELERY_TASK_TRACK_STARTED = True # Track task status more granularly
