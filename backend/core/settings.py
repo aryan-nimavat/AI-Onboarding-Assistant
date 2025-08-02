@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2l1a&ydf@g8g2pho(dp1f19k@zttb$$^p73n@0a7nsd_epf9#@'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # fetch Groq API key
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
@@ -90,9 +90,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ai_onboarding_db',
-        'USER': 'onboarding_user',
-        'PASSWORD': 'onboarding@1110',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
         'HOST': 'localhost', 
         'PORT': '5432',
     }
