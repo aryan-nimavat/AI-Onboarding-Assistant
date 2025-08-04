@@ -45,10 +45,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
+    'corsheaders',
+    # 'agents.apps.AgentsConfig',
+    
     # Third-party apps
     'rest_framework',
     'rest_framework.authtoken', # For TokenAuthentication
-    'channels', # For WebSockets
 
     # My apps
     'agents',
@@ -56,6 +58,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -154,17 +157,6 @@ REST_FRAMEWORK = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Django Channels setup
-ASGI_APPLICATION = 'core.asgi.application' # Points to your ASGI file
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)], # Default Redis host and port
-        },
-    },
-}
 
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0' # For message broker (0 is database number)
@@ -174,3 +166,8 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
 CELERY_TASK_TRACK_STARTED = True # Track task status more granularly
+
+# Allow frontend to send requests
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your React app's local development server
+]

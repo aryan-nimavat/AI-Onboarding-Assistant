@@ -1,0 +1,155 @@
+/* frontend/src/index.css */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7f9;
+  color: #333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Header Styles */
+.header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.header-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.header-link:hover {
+  color: #bdc3c7;
+}
+
+/* Login/Form Styles */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.login-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #34495e;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+/* Dashboard-specific styles (from previous response) */
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.dashboard-list-panel {
+  flex: 1;
+  padding-right: 2rem;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 2rem;
+}
+
+.dashboard-details-panel {
+  flex: 2;
+  padding-top: 2rem;
+}
+
+/* Media query for responsive design on screens wider than 768px */
+@media (min-width: 768px) {
+  .dashboard-layout {
+    flex-direction: row;
+  }
+  .dashboard-list-panel {
+    border-right: 2px solid #ccc;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .dashboard-details-panel {
+    padding-top: 0;
+    padding-left: 2rem;
+  }
+}
+
+.list-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.list-item:hover {
+  background-color: #f0f0f0;
+}
+
+.list-item.selected {
+  background-color: #e0e0e0;
+}

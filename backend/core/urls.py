@@ -1,8 +1,9 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework.authtoken import views # import views for token authentication
 from django.conf import settings
 from django.conf.urls.static import static
+from django.core.asgi import get_asgi_application
 
 urlpatterns = [
     path('admin/', admin.site.urls),

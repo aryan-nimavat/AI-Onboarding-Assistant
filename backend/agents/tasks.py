@@ -3,11 +3,9 @@ import os
 from celery import shared_task
 from django.conf import settings
 from groq import Groq
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
 from .models import CallRecording, ExtractedClientInfo
-import logging
 import json
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -16,24 +14,11 @@ def process_call_recording_for_transcription(self, recording_id):
     """
     Celery task to handle audio transcription using Groq API.
     """
-    channel_layer = get_channel_layer()
     try:
         recording = CallRecording.objects.get(id=recording_id)
         user_id = recording.uploaded_by.id if recording.uploaded_by else None
 
-        # Notify frontend: Status Update - Transcribing
-        async_to_sync(channel_layer.group_send)(
-            f"user_{user_id}",
-            {
-                "type": "send_message",
-                "message": {
-                    "type": "call_status",
-                    "call_id": recording.id,
-                    "status": "TRANSCRIBING",
-                    "detail": "Sending audio to Groq for transcription."
-                }
-            }
-        )
+        
         recording.status = 'TRANSCRIBING'
         recording.save(update_fields=['status'])
 
@@ -53,32 +38,7 @@ def process_call_recording_for_transcription(self, recording_id):
         recording.save(update_fields=['transcript_text', 'status'])
         logger.info(f"CallRecording {recording.id} successfully transcribed.")
 
-        # Notify frontend: Status Update - Transcribed
-        async_to_sync(channel_layer.group_send)(
-            f"user_{user_id}",
-            {
-                "type": "send_message",
-                "message": {
-                    "type": "call_status",
-                    "call_id": recording.id,
-                    "status": "TRANSCRIBED",
-                    "detail": "Transcription complete. Ready for NLP processing."
-                }
-            }
-        )
-
-        async_to_sync(channel_layer.group_send)(
-            f"user_{user_id}",
-            {
-                "type": "send_message",
-                "message": {
-                    "type": "call_status",
-                    "call_id": recording.id,
-                    "status": "EXTRACTING_INFO",
-                    "detail": "Transcription complete. Initiating information extraction..."
-                }
-            }
-        )
+        
         recording.status = 'EXTRACTING_INFO'
         recording.save(update_fields=['status'])
         process_transcript_with_llm_agent.delay(recording.id)
@@ -94,26 +54,13 @@ def process_call_recording_for_transcription(self, recording_id):
         # Update status to reflect error
         recording.status = 'TRANSCRIPTION_FAILED'
         recording.save(update_fields=['status'])
-        # Notify frontend: Status Update - Failed
-        async_to_sync(channel_layer.group_send)(
-            f"user_{user_id}",
-            {
-                "type": "send_message",
-                "message": {
-                    "type": "call_status",
-                    "call_id": recording.id,
-                    "status": "TRANSCRIPTION_FAILED",
-                    "detail": f"Transcription failed: {str(e)}"
-                }
-            }
-        )
-        
+
+
 @shared_task(bind=True)
 def process_transcript_with_llm_agent(self, recording_id):
     """
     Celery task to extract information from the transcript using Groq LLM with MCP tools.
     """
-    channel_layer = get_channel_layer()
     try:
         recording = CallRecording.objects.get(id=recording_id)
         user_id = recording.uploaded_by.id if recording.uploaded_by else None
@@ -210,19 +157,6 @@ def process_transcript_with_llm_agent(self, recording_id):
         recording.status = 'READY_FOR_REVIEW'
         recording.save(update_fields=['status'])
 
-        # Notify frontend: Status Update - Ready for Review
-        async_to_sync(channel_layer.group_send)(
-            f"user_{user_id}",
-            {
-                "type": "send_message",
-                "message": {
-                    "type": "call_status",
-                    "call_id": recording.id,
-                    "status": "READY_FOR_REVIEW",
-                    "detail": "Information extracted. Ready for your review and approval."
-                }
-            }
-        )
 
     except CallRecording.DoesNotExist:
         logger.error(f"CallRecording with ID {recording_id} not found for extraction.")
@@ -230,15 +164,3 @@ def process_transcript_with_llm_agent(self, recording_id):
         logger.error(f"Error extracting info for CallRecording {recording_id}: {e}", exc_info=True)
         recording.status = 'EXTRACTION_FAILED'
         recording.save(update_fields=['status'])
-        async_to_sync(channel_layer.group_send)(
-            f"user_{user_id}",
-            {
-                "type": "send_message",
-                "message": {
-                    "type": "call_status",
-                    "call_id": recording.id,
-                    "status": "EXTRACTION_FAILED",
-                    "detail": f"Information extraction failed: {str(e)}"
-                }
-            }
-        )

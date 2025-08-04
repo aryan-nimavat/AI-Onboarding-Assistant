@@ -1,0 +1,69 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - ./backend/.env
+
+  redis:
+    image: redis:7-alpine
+
+  web:
+    build: ./backend
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+      - ./media:/app/media
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    build: ./backend
+    command: celery -A core worker -l info
+    volumes:
+      - ./backend:/app
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - db
+      - redis
+      - web
+
+  mcp:
+    build: ./mcpserver
+    command: uvicorn main:mcp_app --host 0.0.0.0 --port 8001
+    volumes:
+      - ./mcpserver:/app
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+
+  frontend:
+    build: ./frontend
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules 
+    ports:
+      - "5173:5173"
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:

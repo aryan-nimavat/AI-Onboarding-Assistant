@@ -1,6 +1,6 @@
 # agents/serializers.py
 from rest_framework import serializers
-from .models import CallRecording, ExtractedClientInfo
+from .models import CallRecording, ExtractedClientInfo, Client
 
 class CallRecordingSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,3 +26,8 @@ class ExtractedClientInfoSerializer(serializers.ModelSerializer):
             'raw_llm_output'
         ]
         read_only_fields = ['is_approved', 'approved_by', 'approval_timestamp'] # Onboarder updates these via custom action
+        
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = '__all__'
